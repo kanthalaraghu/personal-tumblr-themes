@@ -12,5 +12,5 @@ This is a 4chan look alike Tumblr theme I built to match preferences for my pers
 * Custom Google Font
 * Pre-included Yotsuba favicon
 
- It uses tumblr syntax for most post support. I hope to share this with anyone who thinks this theme is nice and... well, wants it.
+I hope to share this with anyone who thinks this theme is nice and... well, wants it.
 
