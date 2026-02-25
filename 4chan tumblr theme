@@ -33,7 +33,19 @@
   <link href="https://static.tumblr.com/qudkd6d/OcDnl99gb/style.css" rel="stylesheet" type="text/css" />
 
   <style>
-    /* General reset and base */
+    /**
+     * 4chan Tumblr Theme - Stylesheet
+     * 
+     * A minimalist, retro-inspired Tumblr theme using web standards.
+     * Features full support for Tumblr post types, responsive design,
+     * and semantic HTML5 markup for accessibility and SEO.
+     * 
+     * Color variables are customizable through Tumblr theme options.
+     */
+
+    /* ============================================
+       BASE & RESET STYLES
+       ============================================ */
     html {
       min-height: 100%;
       box-sizing: border-box;
@@ -64,6 +76,7 @@
     a {
       color: {color:Link};
       text-decoration: none;
+      transition: color 0.2s ease;
     }
 
     a:hover,
@@ -84,12 +97,14 @@
       margin: 0;
       padding: 0;
       color: {color:Meme Arrows};
+      font-style: normal;
     }
 
     blockquote:not(.reply)::before,
     q::before {
       content: '>';
       display: inline;
+      font-weight: bold;
     }
 
     /* Remove top/bottom margins for first and last child elements */
@@ -101,7 +116,9 @@
       margin-bottom: 0;
     }
 
-    {block:IfSpoilerText}
+    /* ============================================
+       SPOILER TEXT STYLING
+       ============================================ */
     s,
     strike,
     del {
@@ -119,12 +136,22 @@
     }
     {/block:IfSpoilerText}
 
+    /* ============================================
+       BUTTON & FORM ELEMENTS
+       ============================================ */
+
     button {
       background: none;
       border: none;
       padding: 0;
       font: inherit;
       cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:focus {
+      outline: 2px solid {color:Link};
+      outline-offset: 2px;
     }
 
     .wrapper {
@@ -133,6 +160,10 @@
       max-width: 900px;
       margin: 0 auto;
     }
+
+    /* ============================================
+       LAYOUT UTILITIES
+       ============================================ */
 
     .clearfix::after {
       content: "";
@@ -179,7 +210,9 @@
       margin: 0 0.2rem;
     }
 
-    /* Posts */
+    /* ============================================
+       POST STYLING
+       ============================================ */
     article.post {
       border-top: 1px solid {color:Lines};
       padding: 1rem 0;
@@ -249,32 +282,26 @@
     }
 
     /* Media inside posts */
-    article:nth-of-type(n) .media,
+    /* Media sizing with fallback */
+    .media,
     .reply img {
-      width: 320px;
       max-width: 100%;
       height: auto;
       float: left;
       margin: 0 10px 10px 0;
     }
 
-    article:nth-of-type(2n) .media {
-      width: 370px;
-    }
-
-    article:nth-of-type(3n) .media {
-      width: 420px;
-    }
-
-    article:nth-of-type(4n) .media {
-      width: 470px;
+    .media {
+      width: 320px;
     }
 
     .post-content {
       overflow: hidden;
     }
 
-    .question {
+    /* ============================================
+       MEDIA & CONTENT TYPES
+       ============================================ */
       font-weight: bold;
     }
 
@@ -306,6 +333,10 @@
       display: inline;
     }
 
+    /* ============================================
+       NOTES & COMMENTS
+       ============================================ */
+
     .notes {
       list-style-type: none;
       border-top: 1px solid {color:Lines};
@@ -328,7 +359,10 @@
       display: none;
     }
 
-    /* Pagination */
+    /* ============================================
+       PAGINATION
+       ============================================ */
+
     nav.pagination {
       margin: 10px 0;
       padding: 10px;
@@ -355,6 +389,7 @@
       border: none;
       padding: 0;
       margin-left: 5px;
+      transition: color 0.2s ease;
     }
 
     button.infinite:hover,
@@ -645,7 +680,7 @@
       {block:SubmissionsEnabled}
       <a href="/submit" title="Submit">sm</a> /
       {/block:SubmissionsEnabled}
-      <a href="http://fiveppi.tumblr.com/" title="Credit">thm</a>
+      <a href="http://www.kanthalaraghu.com" title="Credit">thm</a>
       ]
       [ <a href="{BlogURL}/archive" title="Archive">Archive</a> ]
     </nav>
@@ -656,116 +691,153 @@
   <script src="https://static.tumblr.com/cqfswrg/1xXo902k0/jquery_photoset.js" defer></script>
   <script src="https://static.tumblr.com/wgg6svp/jeWobvfj7/unnest.min.js" defer></script>
 
-  <!-- Initialize Photoset and plugins -->
+  <!-- Main theme initialization script -->
   <script defer>
     document.addEventListener('DOMContentLoaded', function () {
-      // Photoset initialization
-      $('.photo-slideshow').pxuPhotoset({
-        gutter: '8px',
-        rounded: false
-      });
-
-      // Lightbox setup
-      function setupLightbox() {
-        $('.make_lightbox').off('click').on('click', function () {
-          const $el = $(this);
-          const lbArray = [{
-            width: $el.data('width'),
-            height: $el.data('height'),
-            low_res: $el.data('lowres'),
-            high_res: $el.data('highres')
-          }];
-          Tumblr.Lightbox.init(lbArray, 1);
-          $('body').toggleClass('tumblr_lightbox_active');
-        });
+      if (typeof $ === 'undefined') {
+        console.error('jQuery is not loaded. Theme features will be limited.');
+        return;
       }
 
-      // Remove empty paragraphs
-      function removeEmptyParagraphs() {
-        $('p').filter(function () {
-          return !$.trim($(this).html());
-        }).remove();
-      }
+      try {
+        // Photoset initialization
+        if (typeof $.fn.pxuPhotoset === 'function') {
+          $('.photo-slideshow').pxuPhotoset({
+            gutter: '8px',
+            rounded: false
+          });
+        }
 
-      // Append tumblr username to replies
-      function appendTumblrUsername() {
-        $('.caption').each(function () {
-          $(this).children('.reply').each(function () {
-            if (!$(this).find('.tumblr_blog').length && !$(this).is(':first-of-type')) {
-              $(this).prepend('<a class="tumblr_blog" href="{BlogURL}">{Name}</a>');
+        // Lightbox setup
+        function setupLightbox() {
+          $('.make_lightbox').off('click').on('click', function () {
+            try {
+              const $el = $(this);
+              const lbArray = [{
+                width: $el.data('width'),
+                height: $el.data('height'),
+                low_res: $el.data('lowres'),
+                high_res: $el.data('highres')
+              }];
+              if (typeof Tumblr !== 'undefined' && Tumblr.Lightbox) {
+                Tumblr.Lightbox.init(lbArray, 1);
+                $('body').toggleClass('tumblr_lightbox_active');
+              }
+            } catch (e) {
+              console.error('Lightbox error:', e);
             }
           });
-        });
-      }
+        }
 
-      // Unnest blockquotes
-      function unnestBlockquotes() {
-        $('.post-content').unNest({
-          yourCaption: ".caption",
-          wrapName: ".reply",
-          newCaptionUsername: false,
-          originalPostCaptionUsername: false,
-          tumblrAvatars: false,
-          usernameColon: false
-        });
-      }
+        // Remove empty paragraphs
+        function removeEmptyParagraphs() {
+          $('p').filter(function () {
+            return !$.trim($(this).html());
+          }).remove();
+        }
 
-      // Toggle post content
-      function togglePosts() {
-        $('main').on('click', '.hide-post', function () {
-          const $post = $(this).closest('.post');
-          $post.children('.post-content').toggle();
-          const $info = $(this).closest('.post-info');
-          $info.toggleClass('open closed');
-          $(this).closest('.button').toggleClass('open closed');
-        });
-      }
-
-      // Call all callbacks
-      function initialize() {
-        setupLightbox();
-        removeEmptyParagraphs();
-        appendTumblrUsername();
-        unnestBlockquotes();
-        togglePosts();
-      }
-
-      initialize();
-
-      // Infinite scroll setup (index page only)
-      {block:IfInfiniteScroll}
-      {block:IndexPage}
-      $('#infinite').one('click', function () {
-        $('main#content').infinitescroll({
-          navSelector: "nav#pagination",
-          nextSelector: "a#next",
-          itemSelector: "article"
-        }, function (newElements) {
-          $(newElements).find('.photo-slideshow').pxuPhotoset({
-            lightbox: true,
-            rounded: false,
-            borderRadius: '0px',
-            gutter: '8px',
-            photoset: '.photo-slideshow',
-            photoWrap: '.photo-data',
-            photo: '.pxu-photo'
+        // Append tumblr username to replies
+        function appendTumblrUsername() {
+          $('.caption').each(function () {
+            $(this).children('.reply').each(function () {
+              if (!$(this).find('.tumblr_blog').length && !$(this).is(':first-of-type')) {
+                $(this).prepend('<a class="tumblr_blog" href="{BlogURL}">{Name}</a>');
+              }
+            });
           });
+        }
 
-          $(newElements).find('.post-content').unNest({
-            yourCaption: ".caption",
-            wrapName: ".reply",
-            newCaptionUsername: false,
-            originalPostCaptionUsername: false,
-            tumblrAvatars: false,
-            usernameColon: false
+        // Unnest blockquotes with error handling
+        function unnestBlockquotes() {
+          try {
+            if (typeof $.fn.unNest === 'function') {
+              $('.post-content').unNest({
+                yourCaption: ".caption",
+                wrapName: ".reply",
+                newCaptionUsername: false,
+                originalPostCaptionUsername: false,
+                tumblrAvatars: false,
+                usernameColon: false
+              });
+            }
+          } catch (e) {
+            console.warn('unNest plugin not available:', e);
+          }
+        }
+
+        // Toggle post content
+        function togglePosts() {
+          $('main').on('click', '.hide-post', function () {
+            const $post = $(this).closest('.post');
+            $post.children('.post-content').slideToggle(200);
+            const $info = $(this).closest('.post-info');
+            $info.toggleClass('open closed');
+            $(this).closest('.button').toggleClass('open closed');
+            $(this).attr('aria-expanded', $info.hasClass('open') ? 'true' : 'false');
           });
+        }
 
-          initialize();
+        // Main initialization function
+        function initialize() {
+          setupLightbox();
+          removeEmptyParagraphs();
+          appendTumblrUsername();
+          unnestBlockquotes();
+          togglePosts();
+        }
+
+        // Run initialization
+        initialize();
+
+        // Infinite scroll setup (index page only)
+        {block:IfInfiniteScroll}
+        {block:IndexPage}
+        $('#infinite').one('click', function () {
+          try {
+            if (typeof $.fn.infinitescroll === 'function') {
+              $('main#content').infinitescroll({
+                navSelector: "nav#pagination",
+                nextSelector: "a#next",
+                itemSelector: "article"
+              }, function (newElements) {
+                // Reinitialize plugins for new elements
+                if (typeof $.fn.pxuPhotoset === 'function') {
+                  $(newElements).find('.photo-slideshow').pxuPhotoset({
+                    lightbox: true,
+                    rounded: false,
+                    borderRadius: '0px',
+                    gutter: '8px',
+                    photoset: '.photo-slideshow',
+                    photoWrap: '.photo-data',
+                    photo: '.pxu-photo'
+                  });
+                }
+
+                if (typeof $.fn.unNest === 'function') {
+                  $(newElements).find('.post-content').unNest({
+                    yourCaption: ".caption",
+                    wrapName: ".reply",
+                    newCaptionUsername: false,
+                    originalPostCaptionUsername: false,
+                    tumblrAvatars: false,
+                    usernameColon: false
+                  });
+                }
+
+                // Reinitialize theme features
+                initialize();
+              });
+              $(this).hide();
+            }
+          } catch (e) {
+            console.error('Infinite scroll error:', e);
+          }
         });
-        $(this).hide();
-      });
-      {/block:IndexPage}
-      {/block:IfInfiniteScroll}
+        {/block:IndexPage}
+        {/block:IfInfiniteScroll}
+      } catch (e) {
+        console.error('Theme initialization error:', e);
+      }
     });
   </script>
 
